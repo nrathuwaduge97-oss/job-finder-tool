@@ -18,13 +18,13 @@
         <header class="text-center mb-12">
             <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 inline-block">Italy Opportunity Hub</span>
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">Job & Work Finder</h1>
-            <p class="text-slate-400 max-w-lg mx-auto text-sm md:text-base">Search live opportunities across Italy instantly with advanced filters.</p>
+            <p class="text-slate-400 max-w-lg mx-auto text-sm md:text-base">Search all real vacancies across Italy. Smart English-to-Italian multi-keyword matching included.</p>
         </header>
 
         <!-- Search & Filter Control Center -->
         <div class="bg-slate-800/60 backdrop-blur-xl p-4 md:p-6 rounded-3xl shadow-2xl border border-slate-700/60 mb-10 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             
-            <!-- Keyword Search (No default) -->
+            <!-- Keyword Search with Expanded Mapping -->
             <div class="md:col-span-5 relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -32,22 +32,30 @@
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Search by job title (e.g. welder, driver)..." 
+                    placeholder="Search in English (e.g. welder, driver, chef)..." 
                     class="w-full pl-11 pr-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm transition"
                 >
             </div>
             
-            <!-- Location Filter (Optional / All Italy) -->
+            <!-- All Italy Regions & Cities Filter -->
             <div class="md:col-span-3">
-                <select id="citySelect" class="w-full px-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 text-sm transition">
-                    <option value="ci=&to=">All Italy / Regions</option>
-                    <option value="ci=8&to=015146">Milano (Abbiategrasso)</option>
-                    <option value="ci=8&to=">Milano (All)</option>
-                    <option value="ci=4&to=">Roma (Lazio)</option>
-                    <option value="ci=13&to=">Torino (Piemonte)</option>
-                    <option value="ci=38&to=">Bologna (Emilia-Romagna)</option>
-                    <option value="ci=117&to=">Firenze (Toscana)</option>
-                    <option value="ci=62&to=">Napoli (Campania)</option>
+                <select id="locationSelect" class="w-full px-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 text-sm transition">
+                    <option value="r=&ci=&to=">🇮🇹 All Italy (Nationwide)</option>
+                    <optgroup label="Regions & Cities">
+                        <option value="r=4&ci=&to=">Lombardia (Region)</option>
+                        <option value="r=12&ci=&to=">Lazio (Region)</option>
+                        <option value="r=1&ci=&to=">Piemonte (Region)</option>
+                        <option value="r=8&ci=&to=">Emilia-Romagna (Region)</option>
+                        <option value="r=16&ci=&to=">Toscana (Region)</option>
+                        <option value="r=4&ci=8&to=">Milano (City)</option>
+                        <option value="r=12&ci=4&to=">Roma (City)</option>
+                        <option value="r=1&ci=13&to=">Torino (City)</option>
+                        <option value="r=8&ci=38&to=">Bologna (City)</option>
+                        <option value="r=16&ci=117&to=">Firenze (City)</option>
+                        <option value="r=15&ci=62&to=">Napoli (City)</option>
+                        <option value="r=9&ci=59&to=">Genova (City)</option>
+                        <option value="r=3&ci=91&to=">Venezia (City)</option>
+                    </optgroup>
                 </select>
             </div>
 
@@ -73,7 +81,7 @@
         <!-- Loading Indicator -->
         <div id="loading" class="hidden text-center py-20">
             <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
-            <p class="text-slate-400 mt-3 text-sm font-medium">Scanning live opportunities...</p>
+            <p class="text-slate-400 mt-3 text-sm font-medium">Scanning all real live vacancies across Italy...</p>
         </div>
 
         <!-- Results Grid -->
@@ -86,18 +94,46 @@
         const API_URL = "https://subito-custom-api.onrender.com/api/ads";
         const API_KEY = "subito_secret_key_2026";
 
+        // Expanded Keyword Map covering all major job fields in English mapped to rich Italian job terms
+        const keywordMap = {
+            "welder": "saldatore tig mig carpentiere",
+            "metal": "carpentiere metallo saldatore",
+            "fabrication": "carpenteria metallica",
+            "driver": "autista corriere magazziniere",
+            "cook": "cuoco chef pizzeria",
+            "chef": "chef cuoco",
+            "waiter": "cameriere sala bar",
+            "cleaner": "pulizie addetto pulizie colf",
+            "mechanic": "meccanico auto officina",
+            "electrician": "elettricista impianti",
+            "plumber": "idraulico termoidraulico",
+            "carpenter": "falegname legno",
+            "warehouse": "magazziniere mulettista logistica",
+            "delivery": "fattorino corriere rider",
+            "nurse": "infermiere oss socio",
+            "painter": "verniciatore imbianchino",
+            "builder": "muratore edile cantiere",
+            "security": "addetto sicurezza portiere guardiano"
+        };
+
         async function fetchJobs() {
-            const query = document.getElementById('searchInput').value.trim();
-            const locationParams = document.getElementById('citySelect').value;
+            let rawQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            const locationParams = document.getElementById('locationSelect').value;
             const sortOrder = document.getElementById('dateSort').value;
             const jobList = document.getElementById('jobList');
             const loading = document.getElementById('loading');
+
+            // Map English keyword to broader Italian search terms if available
+            let translatedQuery = rawQuery;
+            if (keywordMap[rawQuery]) {
+                translatedQuery = keywordMap[rawQuery];
+            }
 
             jobList.innerHTML = "";
             loading.classList.remove('hidden');
 
             try {
-                const targetUrl = `${API_URL}?api_key=${API_KEY}&c=26&${locationParams}&q=${encodeURIComponent(query)}`;
+                const targetUrl = `${API_URL}?api_key=${API_KEY}&c=26&${locationParams}&q=${encodeURIComponent(translatedQuery)}`;
                 
                 const response = await fetch(targetUrl);
                 const data = await response.json();
@@ -107,12 +143,11 @@
                 if (!data.success || !data.items || data.items.length === 0) {
                     jobList.innerHTML = `
                         <div class="col-span-full text-center py-16 bg-slate-800/40 border border-slate-700/50 rounded-3xl">
-                            <p class="text-slate-400 text-base">No listings found matching your criteria.</p>
+                            <p class="text-slate-400 text-base">No real vacancies found matching your search. Try a different keyword or region.</p>
                         </div>`;
                     return;
                 }
 
-                // Date sorting logic
                 let items = data.items;
                 items.sort((a, b) => {
                     let dateA = new Date(a.date || 0);
@@ -124,7 +159,6 @@
                     const card = document.createElement('div');
                     card.className = "bg-slate-800/50 backdrop-blur-md rounded-3xl border border-slate-700/60 p-6 shadow-xl hover:border-indigo-500/50 transition duration-300 flex flex-col justify-between group";
                     
-                    // Handle Price missing case
                     const displayPrice = (job.price && job.price !== "N/A" && job.price.trim() !== "") 
                         ? job.price 
                         : "No price suggested";
@@ -156,12 +190,11 @@
                 loading.classList.add('hidden');
                 jobList.innerHTML = `
                     <div class="col-span-full text-center py-16 bg-red-500/10 border border-red-500/20 rounded-3xl">
-                        <p class="text-red-400 text-sm">Failed to load data. Please verify your connection.</p>
+                        <p class="text-red-400 text-sm">Failed to load data. Please check connection.</p>
                     </div>`;
             }
         }
 
-        // Auto load initial results on page load without keywords
         window.onload = fetchJobs;
     </script>
 </body>
