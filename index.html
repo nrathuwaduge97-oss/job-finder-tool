@@ -24,7 +24,7 @@
         <!-- Search & Filter Control Center -->
         <div class="bg-slate-800/60 backdrop-blur-xl p-4 md:p-6 rounded-3xl shadow-2xl border border-slate-700/60 mb-10 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             
-            <!-- Keyword Search (Direct Subito style) -->
+            <!-- Keyword Search -->
             <div class="md:col-span-5 relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -32,7 +32,7 @@
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Search keyword (e.g. saldatore, autista, etc.)..." 
+                    placeholder="Search keyword (e.g. saldatore, autista)..." 
                     class="w-full pl-11 pr-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm transition"
                 >
             </div>
@@ -40,22 +40,15 @@
             <!-- Location Filter -->
             <div class="md:col-span-3">
                 <select id="locationSelect" class="w-full px-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 text-sm transition">
-                    <option value="r=&ci=&to=">🇮🇹 All Italy (Nationwide)</option>
-                    <optgroup label="Regions & Cities">
-                        <option value="r=4&ci=&to=">Lombardia (Region)</option>
-                        <option value="r=12&ci=&to=">Lazio (Region)</option>
-                        <option value="r=1&ci=&to=">Piemonte (Region)</option>
-                        <option value="r=8&ci=&to=">Emilia-Romagna (Region)</option>
-                        <option value="r=16&ci=&to=">Toscana (Region)</option>
-                        <option value="r=4&ci=8&to=">Milano (City)</option>
-                        <option value="r=12&ci=4&to=">Roma (City)</option>
-                        <option value="r=1&ci=13&to=">Torino (City)</option>
-                        <option value="r=8&ci=38&to=">Bologna (City)</option>
-                        <option value="r=16&ci=117&to=">Firenze (City)</option>
-                        <option value="r=15&ci=62&to=">Napoli (City)</option>
-                        <option value="r=9&ci=59&to=">Genova (City)</option>
-                        <option value="r=3&ci=91&to=">Venezia (City)</option>
-                    </optgroup>
+                    <option value="r=&ci=">🇮🇹 All Italy (Nationwide)</option>
+                    <option value="r=4">Lombardia</option>
+                    <option value="r=12">Lazio</option>
+                    <option value="r=1">Piemonte</option>
+                    <option value="r=8">Emilia-Romagna</option>
+                    <option value="r=16">Toscana</option>
+                    <option value="r=15">Campania</option>
+                    <option value="r=9">Liguria</option>
+                    <option value="r=3">Veneto</option>
                 </select>
             </div>
 
@@ -105,7 +98,6 @@
             loading.classList.remove('hidden');
 
             try {
-                // Build API URL cleanly mimicking Subito structure
                 let targetUrl = `${API_URL}?api_key=${API_KEY}&c=26&${locationParams}`;
                 if (query) {
                     targetUrl += `&q=${encodeURIComponent(query)}`;
@@ -119,7 +111,7 @@
                 if (!data.success || !data.items || data.items.length === 0) {
                     jobList.innerHTML = `
                         <div class="col-span-full text-center py-16 bg-slate-800/40 border border-slate-700/50 rounded-3xl">
-                            <p class="text-slate-400 text-base">No listings found. Try searching without filters or use Italian keywords (e.g. saldatore).</p>
+                            <p class="text-slate-400 text-base">No listings found. Try searching with a keyword like 'saldatore' or select All Italy.</p>
                         </div>`;
                     return;
                 }
@@ -171,7 +163,6 @@
             }
         }
 
-        // Fetch general category items on load without forcing default text
         window.onload = fetchJobs;
     </script>
 </body>
