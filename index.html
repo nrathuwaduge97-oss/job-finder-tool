@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Finder Tool - Italy (Welding & Fabrication)</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-blue-600 mb-2">🇮🇹 Italy Job & Work Finder</h1>
+            <p class="text-slate-500">Find welding, metal fabrication, and other job opportunities easily.</p>
+        </header>
+
+        <!-- Search & Filter Bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4 items-center">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search job (e.g. saldatore, tig, mig, metalcarpentiere)..." 
+                class="flex-1 w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value="saldatore"
+            >
+            <button 
+                onclick="fetchJobs()" 
+                class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            >
+                Search Jobs
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="hidden text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+            <p class="text-slate-500 mt-2">Searching jobs...</p>
+        </div>
+
+        <!-- Results Grid -->
+        <div id="jobList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // Render එකෙන් ලැබුණු ඔයාගේ API URL එක සහ API Key එක මෙන්න
+        const API_URL = "https://subito-custom-api.onrender.com/api/ads";
+        const API_KEY = "subito_secret_key_2026";
+
+        async function fetchJobs() {
+            const query = document.getElementById('searchInput').value.trim();
+            const jobList = document.getElementById('jobList');
+            const loading = document.getElementById('loading');
+
+            jobList.innerHTML = "";
+            loading.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_URL}?api_key=${API_KEY}&c=26&q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                loading.classList.add('hidden');
+
+                if (!data.success || !data.items || data.items.length === 0) {
+                    jobList.innerHTML = `<p class="col-span-full text-center text-slate-400 py-10">No jobs found matching your search.</p>`;
+                    return;
+                }
+
+                data.items.forEach(job => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between";
+                    
+                    card.innerHTML = `
+                        <div>
+                            ${job.thumbnail ? `<img src="${job.thumbnail}" alt="Job Image" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-slate-100 flex items-center justify-center text-slate-400">No Image</div>`}
+                            <div class="p-5">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">${job.location.city || 'Italy'}</span>
+                                    <span class="text-lg font-bold text-emerald-600">${job.price}</span>
+                                </div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-2 line-clamp-2">${job.title}</h3>
+                                <p class="text-slate-500 text-sm line-clamp-3 mb-4">${job.description}</p>
+                            </div>
+                        </div>
+                        <div class="px-5 pb-5 pt-0">
+                            <a href="${job.url}" target="_blank" class="block text-center w-full py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition">
+                                View on Subito ➔
+                            </a>
+                        </div>
+                    `;
+                    jobList.appendChild(card);
+                });
+
+            } catch (error) {
+                loading.classList.add('hidden');
+                jobList.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Failed to load jobs. Please check your API connection.</p>`;
+            }
+        }
+
+        window.onload = fetchJobs;
+    </script>
+</body>
+</html>

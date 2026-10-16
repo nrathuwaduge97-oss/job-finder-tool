@@ -1,0 +1,11 @@
+{
+  "name": "job-finder-tool",
+  "version": "1.0.0",
+  "description": "Job and Welding Search Tool using Subito API",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
