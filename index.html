@@ -3,55 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Finder Tool - Italy (Welding & Fabrication)</title>
-    <!-- Tailwind CSS for modern styling -->
+    <title>Italy Job & Work Finder Pro</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 min-h-screen text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
 
-    <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto px-4 py-12">
         <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold text-blue-600 mb-2">🇮🇹 Italy Job & Work Finder</h1>
-            <p class="text-slate-500">Find welding, metal fabrication, and other job opportunities easily.</p>
+        <header class="text-center mb-12">
+            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 inline-block">Italy Opportunity Hub</span>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">Job & Work Finder</h1>
+            <p class="text-slate-400 max-w-lg mx-auto text-sm md:text-base">Search live opportunities across Italy instantly with advanced filters.</p>
         </header>
 
-        <!-- Search & Filter Bar -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Search job (e.g. saldatore, tig, mig, metalcarpentiere)..." 
-                class="flex-1 w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value="saldatore"
-            >
-            <button 
-                onclick="fetchJobs()" 
-                class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
-            >
-                Search Jobs
-            </button>
+        <!-- Search & Filter Control Center -->
+        <div class="bg-slate-800/60 backdrop-blur-xl p-4 md:p-6 rounded-3xl shadow-2xl border border-slate-700/60 mb-10 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+            
+            <!-- Keyword Search (No default) -->
+            <div class="md:col-span-5 relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search by job title (e.g. welder, driver)..." 
+                    class="w-full pl-11 pr-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 placeholder-slate-500 text-sm transition"
+                >
+            </div>
+            
+            <!-- Location Filter (Optional / All Italy) -->
+            <div class="md:col-span-3">
+                <select id="citySelect" class="w-full px-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 text-sm transition">
+                    <option value="ci=&to=">All Italy / Regions</option>
+                    <option value="ci=8&to=015146">Milano (Abbiategrasso)</option>
+                    <option value="ci=8&to=">Milano (All)</option>
+                    <option value="ci=4&to=">Roma (Lazio)</option>
+                    <option value="ci=13&to=">Torino (Piemonte)</option>
+                    <option value="ci=38&to=">Bologna (Emilia-Romagna)</option>
+                    <option value="ci=117&to=">Firenze (Toscana)</option>
+                    <option value="ci=62&to=">Napoli (Campania)</option>
+                </select>
+            </div>
+
+            <!-- Date Sort Filter -->
+            <div class="md:col-span-2">
+                <select id="dateSort" class="w-full px-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-200 text-sm transition">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+
+            <!-- Search Action Button -->
+            <div class="md:col-span-2">
+                <button 
+                    onclick="fetchJobs()" 
+                    class="w-full py-3.5 px-6 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-600/30 transition duration-200 text-sm flex items-center justify-center gap-2"
+                >
+                    <span>Search</span>
+                </button>
+            </div>
         </div>
 
         <!-- Loading Indicator -->
-        <div id="loading" class="hidden text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
-            <p class="text-slate-500 mt-2">Searching jobs...</p>
+        <div id="loading" class="hidden text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
+            <p class="text-slate-400 mt-3 text-sm font-medium">Scanning live opportunities...</p>
         </div>
 
         <!-- Results Grid -->
         <div id="jobList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Dynamic Cards will appear here -->
+            <!-- Dynamic Cards -->
         </div>
     </div>
 
     <script>
-        // Render එකෙන් ලැබුණු ඔයාගේ API URL එක සහ API Key එක මෙන්න
         const API_URL = "https://subito-custom-api.onrender.com/api/ads";
         const API_KEY = "subito_secret_key_2026";
 
         async function fetchJobs() {
             const query = document.getElementById('searchInput').value.trim();
+            const locationParams = document.getElementById('citySelect').value;
+            const sortOrder = document.getElementById('dateSort').value;
             const jobList = document.getElementById('jobList');
             const loading = document.getElementById('loading');
 
@@ -59,35 +97,55 @@
             loading.classList.remove('hidden');
 
             try {
-                const response = await fetch(`${API_URL}?api_key=${API_KEY}&c=26&q=${encodeURIComponent(query)}`);
+                const targetUrl = `${API_URL}?api_key=${API_KEY}&c=26&${locationParams}&q=${encodeURIComponent(query)}`;
+                
+                const response = await fetch(targetUrl);
                 const data = await response.json();
 
                 loading.classList.add('hidden');
 
                 if (!data.success || !data.items || data.items.length === 0) {
-                    jobList.innerHTML = `<p class="col-span-full text-center text-slate-400 py-10">No jobs found matching your search.</p>`;
+                    jobList.innerHTML = `
+                        <div class="col-span-full text-center py-16 bg-slate-800/40 border border-slate-700/50 rounded-3xl">
+                            <p class="text-slate-400 text-base">No listings found matching your criteria.</p>
+                        </div>`;
                     return;
                 }
 
-                data.items.forEach(job => {
+                // Date sorting logic
+                let items = data.items;
+                items.sort((a, b) => {
+                    let dateA = new Date(a.date || 0);
+                    let dateB = new Date(b.date || 0);
+                    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+                });
+
+                items.forEach(job => {
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between";
+                    card.className = "bg-slate-800/50 backdrop-blur-md rounded-3xl border border-slate-700/60 p-6 shadow-xl hover:border-indigo-500/50 transition duration-300 flex flex-col justify-between group";
                     
+                    // Handle Price missing case
+                    const displayPrice = (job.price && job.price !== "N/A" && job.price.trim() !== "") 
+                        ? job.price 
+                        : "No price suggested";
+
                     card.innerHTML = `
                         <div>
-                            ${job.thumbnail ? `<img src="${job.thumbnail}" alt="Job Image" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-slate-100 flex items-center justify-center text-slate-400">No Image</div>`}
-                            <div class="p-5">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">${job.location.city || 'Italy'}</span>
-                                    <span class="text-lg font-bold text-emerald-600">${job.price}</span>
-                                </div>
-                                <h3 class="font-bold text-lg text-slate-800 mb-2 line-clamp-2">${job.title}</h3>
-                                <p class="text-slate-500 text-sm line-clamp-3 mb-4">${job.description}</p>
+                            <div class="flex justify-between items-start gap-2 mb-4">
+                                <span class="text-xs font-medium px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full">
+                                    ${job.location.city || job.location.region || 'Italy'}
+                                </span>
+                                <span class="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                                    ${displayPrice}
+                                </span>
                             </div>
+                            <h3 class="font-bold text-lg text-white mb-2 group-hover:text-indigo-400 transition line-clamp-2">${job.title}</h3>
+                            <p class="text-slate-400 text-xs mb-2 text-slate-500">${job.date || 'Recent'}</p>
+                            <p class="text-slate-300 text-sm line-clamp-3 mb-6 leading-relaxed">${job.description || 'No description provided.'}</p>
                         </div>
-                        <div class="px-5 pb-5 pt-0">
-                            <a href="${job.url}" target="_blank" class="block text-center w-full py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition">
-                                View on Subito ➔
+                        <div>
+                            <a href="${job.url}" target="_blank" class="flex items-center justify-center w-full py-3 bg-slate-700/60 hover:bg-indigo-600 text-white rounded-2xl font-medium text-sm transition duration-200 border border-slate-600/50 group-hover:border-indigo-500">
+                                View Original Ad ➔
                             </a>
                         </div>
                     `;
@@ -96,10 +154,14 @@
 
             } catch (error) {
                 loading.classList.add('hidden');
-                jobList.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Failed to load jobs. Please check your API connection.</p>`;
+                jobList.innerHTML = `
+                    <div class="col-span-full text-center py-16 bg-red-500/10 border border-red-500/20 rounded-3xl">
+                        <p class="text-red-400 text-sm">Failed to load data. Please verify your connection.</p>
+                    </div>`;
             }
         }
 
+        // Auto load initial results on page load without keywords
         window.onload = fetchJobs;
     </script>
 </body>
